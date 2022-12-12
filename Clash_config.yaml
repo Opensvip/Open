@@ -1,0 +1,432 @@
+port: 7890 # HTTP代理端口
+socks-port: 7891 # SOCKS5代理端口
+mixed-port: 1080 # HTTP and SOCKS5 代理 混合端口
+# redir-port: 17891 # 透明代理端口, Linux and macOS 使用，包括Openwrt
+allow-lan: true # 是否允许局域网连接 # true 启用，false 关闭
+mode: Rule #代理模式  #rule 规则 / global 全局 / direct 直连
+log-level: silent #日志级别 info / warning / error / debug / silent # silent 表示静默
+#interface-name: 本地连接            # 出口网卡名称，例如“本地连接”，Tun 模式使用
+#ipv6: false                          # true 启用，false 关闭
+external-controller: 127.0.0.1:9090 # 访问地址 0.0.0.0 表示其他主机可以访问，可以更换局域网地址，例如 192.168.50.1:9090
+#external-ui: "面板2"                 # 本地面板文件夹，"面板1"，"面板2" 自选
+secret: route       # 访问密码 ："" 无需密码 或者 ："1234" 密码1234 # Secret for RESTful API (可选）
+proxies: #节点配置
+
+#VLESS 规则（Meta专属）
+  - name: "节点名称"
+    type: vless #节点类型
+    server: #节点地址
+    port: #节点端口
+    uuid: #节点UUID
+    udp: true
+    tls: true
+    network: ws
+    servername: #节点地址 # priority over wss host
+    # skip-cert-verify: true
+    ws-opts:
+      path: "/"
+      headers:
+        Host: #节点地址
+    # fingerprint: xxxx
+    
+#VMess+WS+TLS #节点配置
+  - {name: 节点名称, server: 节点地址IP或者网址, port: 端口, type: vmess, uuid: UUID地址, alterId: 0, cipher: auto, tls: true, skip-cert-verify: false, network: ws, ws-opts: {path: /, headers: {Host: 节点地址IP或者网址}}, udp: true}
+
+#VMess+WS #节点配置
+  - {name: 节点名称, server: 节点地址IP或者网址, port: 端口, type: vmess, uuid: UUID地址, alterId: 0, cipher: auto, tls: false, network: ws, ws-opts: {path: /, headers: {Host: 节点地址IP或者网址}}}
+
+
+proxy-providers: #proxy-provider：俗称代理集合
+# 节点配置文件统一存放在 ./profiles/proxies/ 目录中#
+#---------------------------------------------------#
+# 从链接导入的配置文件/节点 （这边我暂时未启用，需要请删除本行以下的#号即可使用）
+#  China: #proxy-groups 设置下 use 引用的节点名称
+#    type: http
+#    path: ./profiles/proxies/ch.yaml
+#    url: https://example-url (clash 订阅链接)
+#    interval: 3600
+#    filter: 'Hong Kong' # 删选出含有该关键词的节点
+#    health-check:
+#      enable: true
+#      url: http://www.gstatic.com/generate_204
+#      interval: 300
+#  HongKong: #proxy-groups 设置下 use 引用的节点名称
+#    type: http
+#    path: ./profiles/proxies/hk.yaml
+#    url: https://example-url (clash 订阅链接)
+#    filter: 'IEPL-香港' # 删选出含有该关键词的节点
+#    interval: 3600
+#    health-check:
+#      enable: true
+#      url: http://www.gstatic.com/generate_204
+#      interval: 300
+#  USA: #proxy-groups 设置下 use 引用的节点名称
+#    type: http
+#    path: ./profiles/proxies/us.yaml
+#    url: https://example-url (clash 订阅链接)
+#    filter: 'IEPL-香港' # 删选出含有该关键词的节点
+#    interval: 3600
+#    health-check:
+#      enable: true
+#      url: http://www.gstatic.com/generate_204
+#      interval: 300
+#---------------------------------------------------#
+# 从文件导入的配置文件/节点#（这边我暂时未启用，需要请删除本行以下的#号即可使用）
+  # CH: #CH是 proxy-groups 设置下 use 引用的节点名称 可自行修改#
+  #   type: file
+  #   path: ./profiles/proxies/ch.yaml
+  #   health-check:
+  #     enable: true
+  #     url: http://www.gstatic.com/generate_204
+  #     interval: 300
+  # HK: #HK是 proxy-groups 设置下 use 引用的节点名称 可自行修改#
+  #   type: file
+  #   path: ./profiles/proxies/hk.yaml
+  #   health-check:
+  #     enable: true
+  #     url: http://www.gstatic.com/generate_204
+  #     interval: 300
+  # US: #US是 proxy-groups 设置下 use 引用的节点名称 可自行修改#
+  #   type: file
+  #   path: ./profiles/proxies/us.yaml
+  #   health-check:
+  #     enable: true
+  #     url: http://www.gstatic.com/generate_204
+  #     interval: 300
+#---------------------------------------------------#
+# 类型选择 简介
+# select : 用于选择代理或代理组, 可以通过 RESTful API 来切换代理，建议在 GUI 中使用
+# load-balance : 相同eTLD+1的请求将拨号到同一个代理。
+# url-test : 通过对 URL 的速度进行基准测试来选择将使用哪个代理。
+# fallback : 按优先级选择可用的策略。通过访问 URL 来测试可用性，就像自动 url-test 组一样。
+# relay : 中继链接代理。代理不应包含中继。不支持 UDP。 流量：Clash <-> http <-> vmess <-> ss1 <-> ss2 <-> Internet
+#
+# 推荐选择：
+#   命令行服务建议选择 url-test / fallback / load-balance
+#   GUI窗口 官方建议选择 select ，当然也推荐使用url-test 自动检测可用性。
+#---------------------------------------------------#
+
+proxy-groups: #proxy-groups 是代理组
+  - name: 🚀 中国节点选择
+    type: select
+    proxies:
+      - ♻️ 中国代理自动
+      - 🇨🇳 中国手动切换
+      - 🔮 中国负载均衡
+      - 🎯 全球直连
+      - 🛑 全球拦截
+
+  - name: 🚀 海外节点选择
+    type: select
+    proxies:
+      - ♻️ 香港代理自动
+      - ♻️ 美国代理自动
+      - 🇭🇰 香港手动切换
+      - 🇺🇸 美国手动切换
+      - 🔮 香港负载均衡
+      - 🔮 美国负载均衡
+      - 🎯 全球直连
+      - 🛑 全球拦截
+
+  - name: 🇨🇳 中国手动切换
+    type: select
+    use: # 引入proxy-provider 使用 use 关键字#
+      - CH # 本地代理列表文件
+    proxies:
+      - ♻️ 中国代理自动
+      - 🎯 全球直连
+      - 🛑 全球拦截
+
+
+  - name: 🇭🇰 香港手动切换
+    type: select
+    use: # 引入proxy-provider 使用 use 关键字#
+      - HK
+    proxies:
+      - ♻️ 香港代理自动
+      - 🎯 全球直连
+      - 🛑 全球拦截
+
+  - name: 🇺🇸 美国手动切换
+    type: select
+    use: # 引入proxy-provider 使用 use 关键字#
+      - US
+    proxies:
+      - ♻️ 美国代理自动
+      - 🎯 全球直连
+      - 🛑 全球拦截
+
+  - name: ♻️ 中国代理自动
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    use: # 引入proxy-provider 使用 use 关键字#
+      - CH
+    proxies:
+
+  - name: ♻️ 香港代理自动
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    use: # 引入proxy-provider 使用 use 关键字#
+      - HK
+    proxies:
+
+  - name: ♻️ 美国代理自动
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    use: # 引入proxy-provider 使用 use 关键字#
+      - US
+    proxies:
+
+  - name: 🔮 中国负载均衡
+    type: load-balance
+#    strategy: consistent-hashing #一致散列-同一有效顶级域名(eTLD)使用同一代理IP
+    strategy: round-robin #循环轮流-所有请求不使用同一代理IP
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    use: # 引入proxy-provider 使用 use 关键字#
+      - CH
+    proxies:
+
+  - name: 🔮 香港负载均衡
+    type: load-balance
+    strategy: consistent-hashing #一致散列-同一有效顶级域名(eTLD)使用同一代理IP
+#    strategy: round-robin #循环轮流-所有请求不使用同一代理IP
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    use: # 引入proxy-provider 使用 use 关键字#
+      - HK
+    proxies:
+
+  - name: 🔮 美国负载均衡
+    type: load-balance
+    strategy: consistent-hashing #一致散列-同一有效顶级域名(eTLD)使用同一代理IP
+#    strategy: round-robin #循环轮流-所有请求不使用同一代理IP
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    use: # 引入proxy-provider 使用 use 关键字#
+      - US
+    proxies:
+
+  - name: 🎯 全球直连
+    type: select
+    proxies:
+      - DIRECT
+  - name: 🛑 全球拦截
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+  - name: 🍃 应用净化
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+  - name: 🐟 漏网之鱼
+    type: select
+    proxies:
+      - 🚀 海外节点选择
+      - 🚀 中国节点选择
+      - ♻️ 中国代理自动
+      - ♻️ 香港代理自动
+      - ♻️ 美国代理自动
+      - 🇭🇰 香港手动切换
+      - 🇺🇸 美国手动切换
+      - 🔮 中国负载均衡
+      - 🔮 香港负载均衡
+      - 🔮 美国负载均衡
+      - 🎯 全球直连
+      - 🛑 全球拦截
+
+  - name: 🇨🇳 中国特殊代理
+    type: select
+    use: # 引入proxy-provider 使用 use 关键字#
+      - CH
+    proxies:
+      - 🚀 中国节点选择
+      - ♻️ 中国代理自动
+      - 🔮 中国负载均衡
+      - 🎯 全球直连
+      - 🛑 全球拦截
+
+  - name: 🌏 海外特殊代理
+    type: select
+    use: # 引入proxy-provider 使用 use 关键字#
+      - HK
+      - US
+    proxies:
+      - 🚀 海外节点选择
+      - ♻️ 香港代理自动
+      - ♻️ 美国代理自动
+      - 🔮 香港负载均衡
+      - 🔮 美国负载均衡
+      - 🎯 全球直连
+      - 🛑 全球拦截
+
+#---------------------------------------------------#
+# github-clash-rules项目提供的规则集 # https://github.com/Loyalsoldier/clash-rules #
+#  name: # Provider 名称
+#   type: http # http 或 file
+#   behavior: classical # 或 ipcidr、domain
+#   path: # 文件路径
+#   url: # 只有当类型为 HTTP 时才可用，您不需要在本地空间中创建新文件。
+#   interval: # 自动更新间隔，仅在类型为 HTTP 时可用
+#---------------------------------------------------#
+
+rule-providers: #rule-provider：俗称规则集合#
+  reject: #广告域名列表
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt"
+    path: ./ruleset/reject.yaml
+    interval: 86400
+
+  icloud: #iCloud 域名列表
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/icloud.txt"
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+
+  apple: #Apple 在中国大陆可直连的域名列表
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/apple.txt"
+    path: ./ruleset/apple.yaml
+    interval: 86400
+
+  google: #[慎用]Google 在中国大陆可直连的域名列表
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/google.txt"
+    path: ./ruleset/google.yaml
+    interval: 86400
+
+  proxy: #代理域名列表
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt"
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+
+  direct: #直连域名列表
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt"
+    path: ./ruleset/direct.yaml
+    interval: 86400
+
+  private: #私有网络专用域名列表
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/private.txt"
+    path: ./ruleset/private.yaml
+    interval: 86400
+
+  gfw: #GFWList 域名列表 gfw.txt
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/gfw.txt"
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+
+  greatfire: #GreatFire 域名列表
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/greatfire.txt"
+    path: ./ruleset/greatfire.yaml
+    interval: 86400
+
+  tld-not-cn: #非中国大陆使用的顶级域名列表
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/tld-not-cn.txt"
+    path: ./ruleset/tld-not-cn.yaml
+    interval: 86400
+
+  telegramcidr: #Telegram 使用的 IP 地址列表
+    type: http
+    behavior: ipcidr
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/telegramcidr.txt"
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+
+  cncidr: #中国大陆 IP 地址列表
+    type: http
+    behavior: ipcidr
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/cncidr.txt"
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+
+  lancidr: #局域网 IP 及保留 IP 地址列表
+    type: http
+    behavior: ipcidr
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/lancidr.txt"
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+
+  applications: #需要直连的常见软件列表
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/applications.txt"
+    path: ./ruleset/applications.yaml
+    interval: 86400
+
+  lan: #局域网IP列表
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@master/Rulesets/Clash/Basic/LAN.yaml"
+    path: ./ruleset/LAN.yaml
+    interval: 3600
+
+  microsoft: {type: http, behavior: classical, path: ./Filter/Microsoft, url: https://cdn.jsdelivr.net/gh/Semporia/Clash-X@master/Filter/Microsoft.yaml, interval: 3600}
+
+#---------------------------------------------------#
+
+rules: #rules 是规则 #白名单模式rule配置#
+#---------------------------------------------------#
+#例子：   - RULE-SET,telegramcidr,🌍 国外代理
+#  RULE-SET 是规则集的意思
+#  telegramcidr 为规则集的名称
+#  🌍 国外代理 为代理策略组名称
+#---------------------------------------------------#
+   - DOMAIN-SUFFIX,google.com,🇺🇸 美国手动切换      #指定网址关键字-连接节点
+   - DOMAIN-KEYWORD,google,🇺🇸 美国手动切换         #指定网址关键字-连接节点
+   - DOMAIN-KEYWORD,apple,🇺🇸 美国手动切换          #指定网址关键字-连接节点
+   - DOMAIN-KEYWORD,openai,♻️ 美国代理自动         #指定网址关键字-连接节点
+   - DOMAIN,clash.razord.top,🎯 全球直连          #Clash蓝色面板-连接节点
+   - DOMAIN,yacd.haishan.me,🎯 全球直连           #Clash黑色面板-连接节点
+   - RULE-SET,lancidr,🎯 全球直连                 #局域网 IP 及保留 IP 地址列表-连接节点
+   - RULE-SET,proxy,🚀 海外节点选择                #代理域名列表-连接节点
+   - RULE-SET,tld-not-cn,🚀 海外节点选择           #非中国大陆使用的顶级域名列表-连接节点
+   - RULE-SET,cncidr,🚀 中国节点选择               #中国大陆 IP 地址列表-连接节点
+   - RULE-SET,direct,🚀 中国节点选择               #直连域名列表-连接节点
+   - RULE-SET,applications,🎯 全球直连            #需要直连的常见软件列表-连接节点
+   - RULE-SET,reject,🛑 全球拦截                  #广告域名列表-连接节点
+   - RULE-SET,gfw,🚀 海外节点选择                	 #GFWList 域名列表-连接节点
+   - RULE-SET,private,🚀 海外节点选择,no-resolve   #私有网络专用域名列表-连接节点
+   - RULE-SET,icloud,🚀 海外节点选择             	 #iCloud 域名列表-连接节点
+   - RULE-SET,apple,🚀 海外节点选择                #Apple 在中国大陆可直连的域名列表-连接节点
+   - RULE-SET,google,🚀 海外节点选择               #[慎用]Google 在中国大陆可直连的域名列表-连接节点
+   - RULE-SET,telegramcidr,🚀 海外节点选择         #Telegram 使用的 IP 地址列表-连接节点
+   - GEOIP,LAN,🎯 全球直连                        #局域网IP列表-连接节点
+   - GEOIP,CN,🚀 中国节点选择                      #中国CN域名-连接节点
+   - MATCH,🐟 漏网之鱼                            #不在规则之中的域名-连接节点
+#---------------------------------------------------#
+#  - DOMAIN-SUFFIX：域名后缀匹配
+#  - DOMAIN：域名匹配
+#  - DOMAIN-KEYWORD：域名关键字匹配
+#  - IP-CIDR：IP段匹配
+#  - SRC-IP-CIDR：源IP段匹配
+#  - GEOIP：GEOIP 数据库（国家代码）匹配
+#  - DST-PORT：目标端口匹配
+#  - SRC-PORT：源端口匹配
+#  - PROCESS-NAME：源进程名匹配
+#  - RULE-SET：Rule Provider 规则匹配
+#  - MATCH：全匹配
+# 以上规则集来自：https://github.com/Loyalsoldier/clash-rules/blob/master/README.md #大神规则
+# 使用说明来自：
+# ①冰封承若：https://bfchengnuo.com/2021/06/23/ClashX%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8/
+# ②姆斯的日常：https://www.jamesdailylife.com/rule-proxy-provider

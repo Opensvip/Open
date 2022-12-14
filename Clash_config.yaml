@@ -13,51 +13,51 @@ secret: route       # 访问密码 ："" 无需密码 或者 ："1234" 密码123
 proxies: #节点配置
 
 #VLESS 规则（Meta专属）
-  - name: "节点名称"
-    type: vless #节点类型
-    server: #节点地址
-    port: #节点端口
-    uuid: #节点UUID
-    udp: true
-    tls: true
-    network: ws
-    servername: #节点地址 # priority over wss host
+#  - name: "节点名称"
+#    type: vless #节点类型
+#    server: #节点地址
+#    port: #节点端口
+#    uuid: #节点UUID
+#    udp: true
+#    tls: true
+#    network: ws
+#    servername: #节点地址 # priority over wss host
     # skip-cert-verify: true
-    ws-opts:
-      path: "/"
-      headers:
-        Host: #节点地址
+#    ws-opts:
+#      path: "/"
+#      headers:
+#        Host: #节点地址
     # fingerprint: xxxx
 
-  #VMess+WS+TLS #节点配置
-  - name: 📈 节点名称
-    type: vmess
-    server: 节点地址IP或者网址
-    port: 节点端口
-    uuid: UUID地址
-    alterId: 0
-    cipher: auto
-    tls: true
-    network: ws
-    ws-opts:
-      path: /
-      headers:
-        Host: 节点地址IP或者网址
+#VMess+WS+TLS #节点配置
+#  - name: 📈 节点名称
+#    type: vmess
+#    server: 节点地址IP或者网址
+#    port: 节点端口
+#    uuid: UUID地址
+#    alterId: 0
+#    cipher: auto
+#    tls: true
+#    network: ws
+#    ws-opts:
+#      path: /
+#      headers:
+#        Host: 节点地址IP或者网址
         
-  #VMess+WS #节点配置
-  - name: TX-219
-    server: 节点地址IP或者网址
-    port: 节点端口
-    type: vmess
-    uuid: UUID地址
-    alterId: 0
-    cipher: auto
-    tls: false
-    network: ws
-    ws-opts:
-      path: /
-      headers:
-        Host: 节点地址IP或者网址
+#VMess+WS #节点配置
+#  - name: TX-219
+#    server: 节点地址IP或者网址
+#    port: 节点端口
+#    type: vmess
+#    uuid: UUID地址
+#    alterId: 0
+#    cipher: auto
+#    tls: false
+#    network: ws
+#    ws-opts:
+#      path: /
+#      headers:
+#        Host: 节点地址IP或者网址
 
 proxy-providers: #proxy-provider：俗称代理集合
 # 节点配置文件统一存放在 ./profiles/proxies/ 目录中#

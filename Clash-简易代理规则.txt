@@ -1,0 +1,283 @@
+port: 7890 # HTTP代理端口
+socks-port: 7891 # SOCKS5代理端口
+mixed-port: 1080 # HTTP and SOCKS5 代理 混合端口
+# redir-port: 17891 # 透明代理端口, Linux and macOS 使用，包括Openwrt
+allow-lan: true # 是否允许局域网连接 # true 启用，false 关闭
+mode: Rule #代理模式  #rule 规则 / global 全局 / direct 直连
+log-level: silent #日志级别 info / warning / error / debug / silent # silent 表示静默
+#interface-name: 本地连接            # 出口网卡名称，例如“本地连接”，Tun 模式使用
+#ipv6: false                          # true 启用，false 关闭
+external-controller: 127.0.0.1:9090 # 访问地址 0.0.0.0 表示其他主机可以访问，可以更换局域网地址，例如 192.168.50.1:9090
+#external-ui: "面板2"                 # 本地面板文件夹，"面板1"，"面板2" 自选
+secret: route       # 访问密码 ："" 无需密码 或者 ："1234" 密码1234 # Secret for RESTful API (可选）
+proxies: #节点配置
+#VLESS 规则（Meta专属）
+#  - name: "节点名称"
+#    type: vless #节点类型
+#    server: #节点地址
+#    port: #节点端口
+#    uuid: #节点UUID
+#    udp: true
+#    tls: true
+#    network: ws
+#    servername: #节点地址 # priority over wss host
+    # skip-cert-verify: true
+#    ws-opts:
+#      path: "/"
+#      headers:
+#        Host: #节点地址
+    # fingerprint: xxxx
+
+#VMess+WS+TLS #节点配置
+#  - name: 📈 节点名称
+#    type: vmess
+#    server: 节点地址IP或者网址
+#    port: 节点端口
+#    uuid: UUID地址
+#    alterId: 0
+#    cipher: auto
+#    tls: true
+#    network: ws
+#    ws-opts:
+#      path: /
+#      headers:
+#        Host: 节点地址IP或者网址
+        
+#VMess+WS #节点配置
+#  - name: TX-219
+#    server: 节点地址IP或者网址
+#    port: 节点端口
+#    type: vmess
+#    uuid: UUID地址
+#    alterId: 0
+#    cipher: auto
+#    tls: false
+#    network: ws
+#    ws-opts:
+#      path: /
+#      headers:
+#        Host: 节点地址IP或者网址
+proxy-providers: #proxy-provider：俗称代理集合
+# 节点配置文件统一存放在 ./profiles/proxies/ 目录中#
+#---------------------------------------------------#
+# 从链接导入的配置文件/节点 （这边我暂时未启用，需要请删除本行以下的#号即可使用）
+#  China: #proxy-groups 设置下 use 引用的节点名称
+#    type: http
+#    path: ./profiles/proxies/ch.yaml
+#    url: https://example-url (clash 订阅链接)
+#    interval: 3600
+#    filter: 'Hong Kong' # 删选出含有该关键词的节点
+#    health-check:
+#      enable: true
+#      url: http://www.gstatic.com/generate_204
+#      interval: 300
+#  HongKong: #proxy-groups 设置下 use 引用的节点名称
+#    type: http
+#    path: ./profiles/proxies/hk.yaml
+#    url: https://example-url (clash 订阅链接)
+#    filter: 'IEPL-香港' # 删选出含有该关键词的节点
+#    interval: 3600
+#    health-check:
+#      enable: true
+#      url: http://www.gstatic.com/generate_204
+#      interval: 300
+#  USA: #proxy-groups 设置下 use 引用的节点名称
+#    type: http
+#    path: ./profiles/proxies/us.yaml
+#    url: https://example-url (clash 订阅链接)
+#    filter: 'IEPL-香港' # 删选出含有该关键词的节点
+#    interval: 3600
+#    health-check:
+#      enable: true
+#      url: http://www.gstatic.com/generate_204
+#      interval: 300
+#---------------------------------------------------#
+# 从文件导入的配置文件/节点#（这边我暂时未启用，需要请删除本行以下的#号即可使用）
+  # CH: #CH是 proxy-groups 设置下 use 引用的节点名称 可自行修改#
+  #   type: file
+  #   path: ./profiles/proxies/ch.yaml
+  #   health-check:
+  #     enable: true
+  #     url: http://www.gstatic.com/generate_204
+  #     interval: 300
+  # HK: #HK是 proxy-groups 设置下 use 引用的节点名称 可自行修改#
+  #   type: file
+  #   path: ./profiles/proxies/hk.yaml
+  #   health-check:
+  #     enable: true
+  #     url: http://www.gstatic.com/generate_204
+  #     interval: 300
+  # US: #US是 proxy-groups 设置下 use 引用的节点名称 可自行修改#
+  #   type: file
+  #   path: ./profiles/proxies/us.yaml
+  #   health-check:
+  #     enable: true
+  #     url: http://www.gstatic.com/generate_204
+  #     interval: 300
+#---------------------------------------------------#
+# 类型选择 简介
+# select : 用于选择代理或代理组, 可以通过 RESTful API 来切换代理，建议在 GUI 中使用
+# load-balance : 相同eTLD+1的请求将拨号到同一个代理。
+# url-test : 通过对 URL 的速度进行基准测试来选择将使用哪个代理。
+# fallback : 按优先级选择可用的策略。通过访问 URL 来测试可用性，就像自动 url-test 组一样。
+# relay : 中继链接代理。代理不应包含中继。不支持 UDP。 流量：Clash <-> http <-> vmess <-> ss1 <-> ss2 <-> Internet
+#
+# 推荐选择：
+#   命令行服务建议选择 url-test / fallback / load-balance
+#   GUI窗口 官方建议选择 select ，当然也推荐使用url-test 自动检测可用性。
+#---------------------------------------------------#
+proxy-groups: #proxy-groups 是代理组
+  - name: 🔯 代理模式
+    type: select
+    proxies:
+      - 绕过大陆丨黑名单(GFWlist)
+      - 绕过大陆丨白名单(Whitelist)
+  - name: 🔰 选择节点
+    type: select
+#    use: # 引入proxy-provider 使用 use 关键字#
+#      - HK # 本地代理列表文件
+#      - US # 本地代理列表文件
+    proxies:
+      - DIRECT
+  - name: 🛑 广告拦截
+    type: select
+    proxies:
+      - DIRECT
+      - REJECT
+      - PROXY
+  - name: 绕过大陆丨黑名单(GFWlist)
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 86400
+    proxies:
+      - DIRECT
+  - name: 绕过大陆丨白名单(Whitelist)
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 86400
+    proxies:
+      - PROXY
+  - name: PROXY
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 86400
+    proxies:
+      - 🔰 选择节点
+rule-providers:
+  reject: #广告域名列表 拒绝.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt
+    path: ./ruleset/reject.yaml
+    interval: 86400
+  icloud: #iCloud 域名列表 icloud.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+  apple: #Apple 在中国大陆可直连的域名列表 apple.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt
+    path: ./ruleset/apple.yaml
+    interval: 86400
+  google: #[慎用]Google 在中国大陆可直连的域名列表 google.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt
+    path: ./ruleset/google.yaml
+    interval: 86400
+  proxy: #代理域名列表 proxy.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+  direct: #直连域名列表 direct.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt
+    path: ./ruleset/direct.yaml
+    interval: 86400
+  private: #私有网络专用域名列表 private.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
+    path: ./ruleset/private.yaml
+    interval: 86400
+  gfw: #GFWList 域名列表 gfw.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+  greatfire: #GreatFire 域名列表 greatfire.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/greatfire.txt
+    path: ./ruleset/greatfire.yaml
+    interval: 86400
+  tld-not-cn: #非中国大陆使用的顶级域名列表 TLD-not-cn.txt：
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt
+    path: ./ruleset/tld-not-cn.yaml
+    interval: 86400
+  telegramcidr: #Telegram 使用的 IP 地址列表 telegramcidr.txt：
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+  cncidr: #中国大陆 IP 地址列表 cncidr.txt：
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+  lancidr: #局域网 IP 及保留 IP 地址列表 lancidr.txt：
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+  applications: #需要直连的常见软件列表 applications.txt：
+    type: http
+    behavior: classical
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
+    path: ./ruleset/applications.yaml
+    interval: 86400
+  lan: #局域网IP列表
+    type: http
+    behavior: classical
+    url: https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@master/Rulesets/Clash/Basic/LAN.yaml
+    path: ./ruleset/LAN.yaml
+    interval: 3600
+  microsoft: #微软
+    type: http
+    behavior: classical
+    path: ./Filter/Microsoft
+    url: https://cdn.jsdelivr.net/gh/Semporia/Clash-X@master/Filter/Microsoft.yaml
+    interval: 3600
+rules:
+  - RULE-SET,applications,DIRECT			#需要直连的常见软件列表
+  - DOMAIN,clash.razord.top,DIRECT			#Clash蓝色面板-连接节点
+  - DOMAIN,yacd.haishan.me,DIRECT           		#Clash黑色面板-连接节点
+  - RULE-SET,private,DIRECT   				#私有网络专用域名列表-连接节点
+  - RULE-SET,reject,🛑 广告拦截                		#广告域名列表-连接节点
+  - RULE-SET,icloud,DIRECT             	 		#iCloud 域名列表-连接节点
+  - RULE-SET,apple,DIRECT               		#Apple 在中国大陆可直连的域名列表-连接节点
+  - RULE-SET,google,DIRECT               		#[慎用]Google 在中国大陆可直连的域名列表-连接节点
+  - RULE-SET,tld-not-cn,PROXY           		#非中国大陆使用的顶级域名列表-连接节点
+  - RULE-SET,gfw,PROXY                	 		#GFWList 域名列表-连接节点
+  - RULE-SET,greatfire,PROXY 				#GreatFire 域名列表
+  - RULE-SET,telegramcidr,PROXY        			#Telegram 使用的 IP 地址列表-连接节点
+  - RULE-SET,lancidr,DIRECT                 		#局域网 IP 及保留 IP 地址列表-连接节点
+  - RULE-SET,cncidr,DIRECT               		#中国大陆 IP 地址列表-连接节点
+  - GEOIP,,DIRECT					#匹配私有 IP 地址（局域网）
+  - GEOIP,LAN,DIRECT                      		#局域网IP列表-连接节点
+  - GEOIP,CN,DIRECT                      		#中国CN域名-连接节点
+  - RULE-SET,direct,DIRECT              		#直连域名列表-连接节点
+  - RULE-SET,proxy,🔯 代理模式               		#代理域名列表-连接节点
+  - MATCH,🔯 代理模式                            		#不在规则之中的域名-连接节点

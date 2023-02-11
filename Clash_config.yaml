@@ -64,7 +64,7 @@ proxy-providers: #proxy-provider：俗称代理集合
 #---------------------------------------------------#
 # 从链接导入的配置文件/节点 （这边我暂时未启用，需要请删除本行以下的#号即可使用）
 #  China: #proxy-groups 设置下 use 引用的节点名称
-#    type: http
+#    type: http #http（在线链接配置） #file（本地文件配置）
 #    path: ./profiles/proxies/ch.yaml
 #    url: https://example-url (clash 订阅链接)
 #    interval: 3600
@@ -74,7 +74,7 @@ proxy-providers: #proxy-provider：俗称代理集合
 #      url: http://www.gstatic.com/generate_204
 #      interval: 300
 #  HongKong: #proxy-groups 设置下 use 引用的节点名称
-#    type: http
+#    type: http #http（在线链接配置） #file（本地文件配置）
 #    path: ./profiles/proxies/hk.yaml
 #    url: https://example-url (clash 订阅链接)
 #    filter: 'IEPL-香港' # 删选出含有该关键词的节点
@@ -84,7 +84,7 @@ proxy-providers: #proxy-provider：俗称代理集合
 #      url: http://www.gstatic.com/generate_204
 #      interval: 300
 #  USA: #proxy-groups 设置下 use 引用的节点名称
-#    type: http
+#    type: http #http（在线链接配置） #file（本地文件配置）
 #    path: ./profiles/proxies/us.yaml
 #    url: https://example-url (clash 订阅链接)
 #    filter: 'IEPL-香港' # 删选出含有该关键词的节点
@@ -96,21 +96,21 @@ proxy-providers: #proxy-provider：俗称代理集合
 #---------------------------------------------------#
 # 从文件导入的配置文件/节点#（这边我暂时未启用，需要请删除本行以下的#号即可使用）
   # CH: #CH是 proxy-groups 设置下 use 引用的节点名称 可自行修改#
-  #   type: file
+  #   type: file #http（在线链接配置） #file（本地文件配置）
   #   path: ./profiles/proxies/ch.yaml
   #   health-check:
   #     enable: true
   #     url: http://www.gstatic.com/generate_204
   #     interval: 300
   # HK: #HK是 proxy-groups 设置下 use 引用的节点名称 可自行修改#
-  #   type: file
+  #   type: file #http（在线链接配置） #file（本地文件配置）
   #   path: ./profiles/proxies/hk.yaml
   #   health-check:
   #     enable: true
   #     url: http://www.gstatic.com/generate_204
   #     interval: 300
   # US: #US是 proxy-groups 设置下 use 引用的节点名称 可自行修改#
-  #   type: file
+  #   type: file #http（在线链接配置） #file（本地文件配置）
   #   path: ./profiles/proxies/us.yaml
   #   health-check:
   #     enable: true
@@ -130,7 +130,7 @@ proxy-providers: #proxy-provider：俗称代理集合
 #---------------------------------------------------#
 
 proxy-groups: #proxy-groups 是代理组
-  - name: 🚀 中国节点选择
+  - name: 🇨🇳 中国站点选择
     type: select
     proxies:
       - ♻️ 中国代理自动
@@ -139,7 +139,7 @@ proxy-groups: #proxy-groups 是代理组
       - 🎯 全球直连
       - 🛑 全球拦截
 
-  - name: 🚀 海外节点选择
+  - name: 🌏 国际站点选择
     type: select
     proxies:
       - ♻️ 香港代理自动
@@ -250,8 +250,8 @@ proxy-groups: #proxy-groups 是代理组
   - name: 🐟 漏网之鱼
     type: select
     proxies:
-      - 🚀 海外节点选择
-      - 🚀 中国节点选择
+      - 🌏 国际站点选择
+      - 🇨🇳 中国站点选择
       - ♻️ 中国代理自动
       - ♻️ 香港代理自动
       - ♻️ 美国代理自动
@@ -268,25 +268,44 @@ proxy-groups: #proxy-groups 是代理组
     use: # 引入proxy-provider 使用 use 关键字#
       - CH
     proxies:
-      - 🚀 中国节点选择
+      - 🇨🇳 中国站点选择
       - ♻️ 中国代理自动
       - 🔮 中国负载均衡
       - 🎯 全球直连
       - 🛑 全球拦截
 
-  - name: 🌏 海外特殊代理
+  - name: 🌏 国际特殊代理
     type: select
     use: # 引入proxy-provider 使用 use 关键字#
       - HK
       - US
     proxies:
-      - 🚀 海外节点选择
+      - 🌏 国际站点选择
       - ♻️ 香港代理自动
       - ♻️ 美国代理自动
       - 🔮 香港负载均衡
       - 🔮 美国负载均衡
       - 🎯 全球直连
       - 🛑 全球拦截
+      
+  - name: 🚀 指定域名代理
+    type: select
+    use: # 引入proxy-provider 使用 use 关键字#
+      - HK
+      - US
+      - CH
+    proxies:
+      - 🎯 全球直连
+      - 🛑 全球拦截
+      - 🚀 海外节点选择
+      - 🚀 中国节点选择
+      - 🇺🇸 美国手动切换
+      - ♻️ 香港代理自动
+      - ♻️ 美国代理自动
+      - ♻️ 中国代理自动
+      - 🔮 香港负载均衡
+      - 🔮 美国负载均衡
+      - 🔮 中国负载均衡
 
 #---------------------------------------------------#
 # github-clash-rules项目提供的规则集 # https://github.com/Loyalsoldier/clash-rules #
@@ -404,8 +423,6 @@ rule-providers: #rule-provider：俗称规则集合#
     path: ./ruleset/LAN.yaml
     interval: 3600
 
-  microsoft: {type: http, behavior: classical, path: ./Filter/Microsoft, url: https://cdn.jsdelivr.net/gh/Semporia/Clash-X@master/Filter/Microsoft.yaml, interval: 3600}
-
 #---------------------------------------------------#
 
 rules: #rules 是规则 #白名单模式rule配置#
@@ -422,20 +439,20 @@ rules: #rules 是规则 #白名单模式rule配置#
    - DOMAIN,clash.razord.top,🎯 全球直连          #Clash蓝色面板-连接节点
    - DOMAIN,yacd.haishan.me,🎯 全球直连           #Clash黑色面板-连接节点
    - RULE-SET,lancidr,🎯 全球直连                 #局域网 IP 及保留 IP 地址列表-连接节点
-   - RULE-SET,proxy,🚀 海外节点选择                #代理域名列表-连接节点
-   - RULE-SET,tld-not-cn,🚀 海外节点选择           #非中国大陆使用的顶级域名列表-连接节点
-   - RULE-SET,cncidr,🚀 中国节点选择               #中国大陆 IP 地址列表-连接节点
-   - RULE-SET,direct,🚀 中国节点选择               #直连域名列表-连接节点
+   - RULE-SET,proxy,🌏 国际站点选择                #代理域名列表-连接节点
+   - RULE-SET,tld-not-cn,🌏 国际站点选择           #非中国大陆使用的顶级域名列表-连接节点
+   - RULE-SET,cncidr,🇨🇳 中国站点选择               #中国大陆 IP 地址列表-连接节点
+   - RULE-SET,direct,🇨🇳 中国站点选择               #直连域名列表-连接节点
    - RULE-SET,applications,🎯 全球直连            #需要直连的常见软件列表-连接节点
    - RULE-SET,reject,🛑 全球拦截                  #广告域名列表-连接节点
-   - RULE-SET,gfw,🚀 海外节点选择                	 #GFWList 域名列表-连接节点
-   - RULE-SET,private,🚀 海外节点选择,no-resolve   #私有网络专用域名列表-连接节点
-   - RULE-SET,icloud,🚀 海外节点选择             	 #iCloud 域名列表-连接节点
-   - RULE-SET,apple,🚀 海外节点选择                #Apple 在中国大陆可直连的域名列表-连接节点
-   - RULE-SET,google,🚀 海外节点选择               #[慎用]Google 在中国大陆可直连的域名列表-连接节点
-   - RULE-SET,telegramcidr,🚀 海外节点选择         #Telegram 使用的 IP 地址列表-连接节点
+   - RULE-SET,gfw,🌏 国际站点选择                	 #GFWList 域名列表-连接节点
+   - RULE-SET,private,🌏 国际站点选择,no-resolve   #私有网络专用域名列表-连接节点
+   - RULE-SET,icloud,🌏 国际站点选择             	 #iCloud 域名列表-连接节点
+   - RULE-SET,apple,🌏 国际站点选择                #Apple 在中国大陆可直连的域名列表-连接节点
+   - RULE-SET,google,🌏 国际站点选择               #[慎用]Google 在中国大陆可直连的域名列表-连接节点
+   - RULE-SET,telegramcidr,🌏 国际站点选择         #Telegram 使用的 IP 地址列表-连接节点
    - GEOIP,LAN,🎯 全球直连                        #局域网IP列表-连接节点
-   - GEOIP,CN,🚀 中国节点选择                      #中国CN域名-连接节点
+   - GEOIP,CN,🇨🇳 中国站点选择                      #中国CN域名-连接节点
    - MATCH,🐟 漏网之鱼                            #不在规则之中的域名-连接节点
 #---------------------------------------------------#
 #  - DOMAIN-SUFFIX：域名后缀匹配

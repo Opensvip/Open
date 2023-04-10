@@ -63,7 +63,7 @@ proxy-providers: #proxy-provider：俗称代理集合
 # 节点配置文件统一存放在 ./profiles/proxies/ 目录中#
 #---------------------------------------------------#
 # 从链接导入的配置文件/节点 （这边我暂时未启用，需要请删除本行以下的#号即可使用）
-#  China: #proxy-groups 设置下 use 引用的节点名称
+#  CH: #proxy-groups 设置下 use 引用的节点名称
 #    type: http #http（在线链接配置） #file（本地文件配置）
 #    path: ./profiles/proxies/ch.yaml
 #    url: https://example-url (clash 订阅链接)
@@ -73,7 +73,7 @@ proxy-providers: #proxy-provider：俗称代理集合
 #      enable: true
 #      url: http://www.gstatic.com/generate_204
 #      interval: 300
-#  HongKong: #proxy-groups 设置下 use 引用的节点名称
+#  HK: #proxy-groups 设置下 use 引用的节点名称
 #    type: http #http（在线链接配置） #file（本地文件配置）
 #    path: ./profiles/proxies/hk.yaml
 #    url: https://example-url (clash 订阅链接)
@@ -229,6 +229,30 @@ proxy-groups: #proxy-groups 是代理组
 #    strategy: round-robin #循环轮流-所有请求不使用同一代理IP
     url: http://www.gstatic.com/generate_204
     interval: 300
+    use: # 引入proxy-provider 使用 use 关键字#
+      - US
+    proxies:
+
+  - name: 🔯 CH故障转移
+    type: fallback
+    url: http://www.gstatic.com/generate_204
+    interval: 180
+    use: # 引入proxy-provider 使用 use 关键字#
+      - CH
+    proxies:
+
+  - name: 🔯 HK故障转移
+    type: fallback
+    url: http://www.gstatic.com/generate_204
+    interval: 180
+    use: # 引入proxy-provider 使用 use 关键字#
+      - HK
+    proxies:
+
+  - name: 🔯 US故障转移
+    type: fallback
+    url: http://www.gstatic.com/generate_204
+    interval: 180
     use: # 引入proxy-provider 使用 use 关键字#
       - US
     proxies:
